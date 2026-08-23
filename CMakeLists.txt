@@ -8,6 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_package(Threads REQUIRED)
+find_package(PahoMqttCpp REQUIRED)
 
 
 add_executable(collector
@@ -26,8 +27,8 @@ add_executable(tvm-simulator
     tvm-simulator/TvmSupervisor.cpp
     tvm-simulator/CashDrawer.cpp
     tvm-simulator/PrinterUnit.cpp
+    tvm-simulator/HeartbeatPublisher.cpp
 #    tvm-simulator/CardReader.cpp
-#    tvm-simulator/HeartbeatPublisher.cpp
 )
 
 
@@ -66,4 +67,4 @@ target_compile_options(collector PRIVATE ${COMMON_FLAGS})
 target_compile_options(tvm-simulator PRIVATE ${COMMON_FLAGS})
 
 target_link_libraries(collector PRIVATE Threads::Threads)
-target_link_libraries(tvm-simulator PRIVATE Threads::Threads)
+target_link_libraries(tvm-simulator PRIVATE Threads::Threads PahoMqttCpp::paho-mqttpp3)

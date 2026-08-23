@@ -1,6 +1,8 @@
 #include "TvmSupervisor.hpp"
 #include "CashDrawer.hpp"
+#include "PrinterUnit.hpp"
 #include <iostream>
+#include <memory>
 
 int main() {
     CashDrawer cashDrawer = CashDrawerBuilder()
@@ -27,7 +29,13 @@ int main() {
     else 
         std::cout << "KO" << std::endl;
 
-    I
+    std::unique_ptr<IPrinterUnit> printer = std::make_unique<PrinterUnit>();
+    int nb_ko = 0;
+    for (int i = 0; i < 10000; i++) {
+        if (printer->print("Anana") == false)
+            nb_ko++;
+    }
+    std::cout << "Pourcentage : " << (nb_ko / 10000.0) * 100.0  << "%" << std::endl;
     
     return (0);
 }
