@@ -1,6 +1,7 @@
 #include "TvmSupervisor.hpp"
 #include "CashDrawer.hpp"
 #include "PrinterUnit.hpp"
+#include "HeartbeatPublisher.hpp"
 #include <iostream>
 #include <memory>
 
@@ -36,6 +37,7 @@ int main() {
             nb_ko++;
     }
     std::cout << "Pourcentage : " << (nb_ko / 10000.0) * 100.0  << "%" << std::endl;
-    
+    HeartbeatPublisher heartbeat("tcp://localhost:1883", "client_1", "tvm/heartbeat");
+    std::this_thread::sleep_for(std::chrono::seconds(60));
     return (0);
 }
