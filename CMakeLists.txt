@@ -28,7 +28,9 @@ add_executable(tvm-simulator
     tvm-simulator/CashDrawer.cpp
     tvm-simulator/PrinterUnit.cpp
     tvm-simulator/HeartbeatPublisher.cpp
-#    tvm-simulator/CardReader.cpp
+    tvm-simulator/MqttSubscriber.cpp
+    tvm-simulator/MqttPublisher.cpp
+    tvm-simulator/CardReader.cpp
 )
 
 
@@ -52,8 +54,18 @@ add_executable(test_supervisor
 target_link_libraries(test_supervisor PRIVATE GTest::gtest_main)
 target_include_directories(test_supervisor PRIVATE tvm-simulator)
 
+add_executable(test_card_reader
+    tests/test_card_reader.cpp
+    tvm-simulator/CardReader.cpp
+    tvm-simulator/MqttPublisher.cpp
+    tvm-simulator/MqttSubscriber.cpp
+)
+target_link_libraries(test_card_reader PRIVATE GTest::gtest_main Threads::Threads PahoMqttCpp::paho-mqttpp3)
+target_include_directories(test_card_reader PRIVATE tvm-simulator)
+
 include(GoogleTest)
 gtest_discover_tests(test_supervisor)
+gtest_discover_tests(test_card_reader)
 #========== TEST ===============
 
 
