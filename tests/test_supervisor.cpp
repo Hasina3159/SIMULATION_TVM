@@ -61,6 +61,24 @@ TEST(TvmSupervisorTest, AcceptsErrorFromValidatingPayment) {
     EXPECT_EQ(supervisor.get_state(), TvmState::ERROR);
 }
 
+TEST(TvmSupervisorTest, AcceptsCancelFromSelectingTicket) {
+    TvmSupervisor supervisor;
+    supervisor.set_state(TvmState::SELECTING_TICKET);
+
+    EXPECT_TRUE(supervisor.set_state(TvmState::IDLE));
+    EXPECT_EQ(supervisor.get_state(), TvmState::IDLE);
+}
+
+TEST(TvmSupervisorTest, AcceptsCancelFromAwaitingPayment) {
+    TvmSupervisor supervisor;
+    supervisor.set_state(TvmState::SELECTING_TICKET);
+    supervisor.set_state(TvmState::SUMMARIZING_ORDER);
+    supervisor.set_state(TvmState::AWAITING_PAYMENT);
+
+    EXPECT_TRUE(supervisor.set_state(TvmState::IDLE));
+    EXPECT_EQ(supervisor.get_state(), TvmState::IDLE);
+}
+
 TEST(TvmSupervisorTest, RecoversToIdleAfterError) {
     TvmSupervisor supervisor;
     supervisor.set_state(TvmState::SELECTING_TICKET);

@@ -4,10 +4,12 @@
 TvmSupervisor::TvmSupervisor() : 
     m_state(TvmState::IDLE)
 {
+        // IDLE inclus a chaque etape intermediaire : commande "annuler" du CDC
+        // (tvm/{id}/commands/annuler), le client peut se retirer avant paiement.
         m_order[TvmState::IDLE] = {TvmState::SELECTING_TICKET};
-        m_order[TvmState::SELECTING_TICKET] = {TvmState::SUMMARIZING_ORDER};
-        m_order[TvmState::SUMMARIZING_ORDER] = {TvmState::AWAITING_PAYMENT};
-        m_order[TvmState::AWAITING_PAYMENT] = {TvmState::VALIDATING_PAYMENT};
+        m_order[TvmState::SELECTING_TICKET] = {TvmState::SUMMARIZING_ORDER, TvmState::IDLE};
+        m_order[TvmState::SUMMARIZING_ORDER] = {TvmState::AWAITING_PAYMENT, TvmState::IDLE};
+        m_order[TvmState::AWAITING_PAYMENT] = {TvmState::VALIDATING_PAYMENT, TvmState::IDLE};
         m_order[TvmState::VALIDATING_PAYMENT] = {TvmState::PRINTING, TvmState::ERROR};
         m_order[TvmState::PRINTING] = {TvmState::DISPENSING};
         m_order[TvmState::ERROR] = {TvmState::IDLE};

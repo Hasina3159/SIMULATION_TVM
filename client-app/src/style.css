@@ -1,0 +1,209 @@
+:root {
+  --kiosk-bg: #0b1c2c;
+  --kiosk-frame: #10263b;
+  --screen-bg: #ffffff;
+  --accent: #1e88e5;
+  --accent-dark: #145da0;
+  --accent-cash: #2e7d32;
+  --accent-error: #c62828;
+  --text-dark: #14202c;
+  --text-muted: #5b6b7a;
+  --radius: 14px;
+}
+
+* { box-sizing: border-box; }
+
+html, body, #app {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: radial-gradient(circle at top, #1a3450, #05101c 75%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2vh 0;
+}
+
+.kiosk-frame {
+  width: 420px;
+  min-height: 720px;
+  background: linear-gradient(160deg, var(--kiosk-frame), #0a1522);
+  border-radius: 28px;
+  padding: 18px;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.55), inset 0 0 0 2px #1c3a56;
+  display: flex;
+  flex-direction: column;
+}
+
+.kiosk-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #cfe4ff;
+  font-size: 0.8rem;
+  padding: 4px 10px 12px;
+  letter-spacing: 0.05em;
+}
+
+.kiosk-header .brand {
+  font-weight: 700;
+  color: #fff;
+}
+
+.status-dot {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  margin-right: 6px;
+  background: #c62828;
+}
+.status-dot.connected { background: #43a047; }
+
+.kiosk-screen {
+  flex: 1;
+  background: var(--screen-bg);
+  border-radius: var(--radius);
+  padding: 28px 22px;
+  display: flex;
+  flex-direction: column;
+  color: var(--text-dark);
+  overflow: hidden;
+}
+
+.screen-title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin: 0 0 6px;
+}
+
+.screen-subtitle {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  margin: 0 0 20px;
+}
+
+.screen-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.btn {
+  display: block;
+  width: 100%;
+  border: none;
+  border-radius: 10px;
+  padding: 16px 18px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.08s ease, opacity 0.15s ease;
+  text-align: left;
+}
+.btn:active { transform: scale(0.98); }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.btn-primary { background: var(--accent); color: white; }
+.btn-primary:hover:not(:disabled) { background: var(--accent-dark); }
+
+.btn-secondary { background: #eef2f6; color: var(--text-dark); }
+.btn-secondary:hover:not(:disabled) { background: #dfe6ec; }
+
+.btn-cash {
+  background: var(--accent-cash);
+  color: white;
+  text-align: center;
+  font-size: 1.1rem;
+}
+
+.btn-cancel {
+  background: transparent;
+  color: var(--text-muted);
+  text-decoration: underline;
+  text-align: center;
+  font-weight: 500;
+}
+
+.price-tag {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.recap-card {
+  background: #f4f7fa;
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 8px;
+}
+
+.recap-card .type { font-weight: 700; font-size: 1.1rem; }
+.recap-card .prix { font-size: 1.6rem; font-weight: 800; color: var(--accent-dark); margin-top: 6px; }
+
+.denom-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.montant-box {
+  display: flex;
+  justify-content: space-between;
+  background: #f4f7fa;
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+.montant-box .valeur { color: var(--accent-dark); }
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 5px solid #dde6ee;
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+  margin: 30px auto;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.center-flex {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 10px;
+}
+
+.icon-big { font-size: 3.2rem; }
+
+.erreur-box {
+  background: #fdecea;
+  color: var(--accent-error);
+  border-radius: 10px;
+  padding: 16px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.journal {
+  margin-top: 14px;
+  background: #0b1c2c;
+  color: #7fd67f;
+  font-family: "Courier New", monospace;
+  font-size: 0.68rem;
+  border-radius: 8px;
+  padding: 8px;
+  max-height: 110px;
+  overflow-y: auto;
+}
+.journal div { white-space: nowrap; }
