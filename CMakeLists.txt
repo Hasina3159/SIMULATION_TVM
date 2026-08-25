@@ -12,14 +12,9 @@ find_package(PahoMqttCpp REQUIRED)
 
 
 add_executable(collector
-    collector/main.cpp 
-#    collector/AuthManager.cpp
-#    collector/CashManager.cpp
+    collector/main.cpp
 #    collector/ComptesManager.cpp
 #    collector/MqttListener.cpp
-#    collector/ReservationManager.cpp
-#    collector/RestApiServer.cpp
-#    collector/StorageWriter.cpp
 )
 
 add_executable(tvm-simulator
@@ -61,7 +56,7 @@ add_executable(test_card_reader
     tvm-simulator/MqttSubscriber.cpp
 )
 target_link_libraries(test_card_reader PRIVATE GTest::gtest_main Threads::Threads PahoMqttCpp::paho-mqttpp3)
-target_include_directories(test_card_reader PRIVATE tvm-simulator)
+target_include_directories(test_card_reader PRIVATE tvm-simulator third_party)
 
 include(GoogleTest)
 gtest_discover_tests(test_supervisor)
@@ -69,11 +64,11 @@ gtest_discover_tests(test_card_reader)
 #========== TEST ===============
 
 
-target_include_directories(collector PRIVATE 
+target_include_directories(collector PRIVATE
     collector
-    third_party/httplib
+    third_party
 )
-target_include_directories(tvm-simulator PRIVATE tvm-simulator)
+target_include_directories(tvm-simulator PRIVATE tvm-simulator third_party)
 
 target_compile_options(collector PRIVATE ${COMMON_FLAGS})
 target_compile_options(tvm-simulator PRIVATE ${COMMON_FLAGS})

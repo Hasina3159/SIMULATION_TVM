@@ -7,19 +7,20 @@
 
 class Callback : public mqtt::callback {
 private:
-    std::unordered_map <std::string, std::function<void(mqtt::const_message_ptr)>> m_handlers; 
+    std::function<void(mqtt::const_message_ptr)> m_handler; 
 public:
+    Callback();
     void connected (const std::string &cause) override;
     void connection_lost (const std::string &cause) override;
     void message_arrived (mqtt::const_message_ptr message) override;
     void delivery_complete (mqtt::delivery_token_ptr token) override;
 
-    void register_handler(const std::string &topic, std::function<void(mqtt::const_message_ptr)> handler) {
-        m_handlers[topic] = std::move(handler);
+    void register_handler(std::function<void(mqtt::const_message_ptr)> handler) {
+        m_handler = std::move(handler);
     }
 
-    void unregister_handler(const std::string &topic) {
-        m_handlers.erase(topic);
+    void clean_handler() {
+        m_handler = nullptr;
     }
 };
 

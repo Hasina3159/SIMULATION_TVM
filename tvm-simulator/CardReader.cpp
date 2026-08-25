@@ -16,7 +16,7 @@ CardReader::CardReader(const std::string &server_adress, const std::string &clie
           client_id + "/lwt", "offline", 1, true,
           m_callback))
 {
-    m_callback.register_handler(response_topic, [this](mqtt::const_message_ptr message) {
+    m_callback.register_handler([this](mqtt::const_message_ptr message) {
         on_response_received(message);
     });
     m_response_client->subscribe(response_topic, m_qos);

@@ -29,11 +29,12 @@ bool MqttSubscriber::subscribe(const std::string& p_topic, int p_qos) {
 
 //=============================================================================
 
+Callback::Callback() : m_handler(nullptr) {}
+
 void Callback::message_arrived(mqtt::const_message_ptr message)
 {
-    auto it = m_handlers.find(message->get_topic());
-    if (it != m_handlers.end())
-        it->second(message);
+    if (m_handler)
+        m_handler(message);
 }
 
 void Callback::delivery_complete(mqtt::delivery_token_ptr token) {
