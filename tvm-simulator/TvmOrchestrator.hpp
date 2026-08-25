@@ -51,15 +51,17 @@ private:
     void handle_inserer_espece(const nlohmann::json &payload);
     void handle_payer_carte(const nlohmann::json &payload);
     void handle_annuler();
-    void finaliser_transaction(const std::string &mode_paiement, const std::string &compte_id);
+    void finaliser_transaction(const std::string &mode_paiement, const std::string &compte_id, double monnaie_rendue);
     void annuler_transaction_en_cours();
     void reset_transaction();
     std::string generate_transaction_id();
 
     void publish_etat();
     void publish_caisse();
-    void publish_vente(const std::string &mode_paiement, const std::string &compte_id, const std::string &transaction_id);
+    void publish_vente(const std::string &mode_paiement, const std::string &compte_id,
+                        const std::string &transaction_id, double monnaie_rendue);
     void publish_erreur(const std::string &type, const std::string &message);
+    void publish_annulation(double montant_rendu);
 
 public:
     TvmOrchestrator() = delete;

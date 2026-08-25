@@ -20,8 +20,21 @@ function formatPrix(centimes) {
       <div class="prix">{{ formatPrix(titre.prix) }}</div>
     </div>
 
-    <button class="btn btn-cash" @click="emit('payer', 'especes')">💶 Payer en especes</button>
-    <button class="btn btn-primary" @click="emit('payer', 'carte')">💳 Payer par carte</button>
+    <button class="btn btn-cash" @click="emit('payer', 'especes')">
+      <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="6" width="20" height="12" rx="2" />
+        <circle cx="12" cy="12" r="3" />
+        <path d="M6 12h.01M18 12h.01" />
+      </svg>
+      Payer en especes
+    </button>
+    <button class="btn btn-primary" @click="emit('payer', 'carte')">
+      <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="5" width="20" height="14" rx="2" />
+        <line x1="2" y1="10" x2="22" y2="10" />
+      </svg>
+      Payer par carte
+    </button>
     <button class="btn btn-cancel" @click="emit('annuler')">Annuler</button>
   </div>
 </template>

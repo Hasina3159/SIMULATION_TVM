@@ -20,7 +20,7 @@ html, body, #app {
 
 body {
   font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  background: radial-gradient(circle at top, #1a3450, #05101c 75%);
+  background: var(--kiosk-bg);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -31,10 +31,10 @@ body {
 .kiosk-frame {
   width: 420px;
   min-height: 720px;
-  background: linear-gradient(160deg, var(--kiosk-frame), #0a1522);
+  background: var(--kiosk-frame);
   border-radius: 28px;
   padding: 18px;
-  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.55), inset 0 0 0 2px #1c3a56;
+  border: 1px solid #1c3a56;
   display: flex;
   flex-direction: column;
 }
@@ -52,6 +52,17 @@ body {
 .kiosk-header .brand {
   font-weight: 700;
   color: #fff;
+}
+
+.etat-badge {
+  background: #1c3a56;
+  color: #cfe4ff;
+  font-family: "Courier New", monospace;
+  font-weight: 700;
+  font-size: 0.7rem;
+  letter-spacing: 0;
+  padding: 3px 8px;
+  border-radius: 6px;
 }
 
 .status-dot {
@@ -95,7 +106,9 @@ body {
 }
 
 .btn {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 10px;
   width: 100%;
   border: none;
   border-radius: 10px;
@@ -103,10 +116,10 @@ body {
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: transform 0.08s ease, opacity 0.15s ease;
+  transition: opacity 0.15s ease;
   text-align: left;
 }
-.btn:active { transform: scale(0.98); }
+.btn:active { opacity: 0.85; }
 .btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
 .btn-primary { background: var(--accent); color: white; }
@@ -118,7 +131,7 @@ body {
 .btn-cash {
   background: var(--accent-cash);
   color: white;
-  text-align: center;
+  justify-content: center;
   font-size: 1.1rem;
 }
 
@@ -126,7 +139,7 @@ body {
   background: transparent;
   color: var(--text-muted);
   text-decoration: underline;
-  text-align: center;
+  justify-content: center;
   font-weight: 500;
 }
 
@@ -184,7 +197,19 @@ body {
   gap: 10px;
 }
 
-.icon-big { font-size: 3.2rem; }
+.icon-big {
+  width: 64px;
+  height: 64px;
+  color: var(--accent-dark);
+}
+.icon-big.icon-error { color: var(--accent-error); }
+.icon-big.icon-success { color: var(--accent-cash); }
+
+.btn-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
 
 .erreur-box {
   background: #fdecea;
@@ -203,7 +228,12 @@ body {
   font-size: 0.68rem;
   border-radius: 8px;
   padding: 8px;
-  max-height: 110px;
-  overflow-y: auto;
+  height: 170px;
+  overflow-y: scroll;
+  scrollbar-width: thin;
+  scrollbar-color: #2e4a63 #0b1c2c;
 }
-.journal div { white-space: nowrap; }
+.journal div { white-space: nowrap; padding: 1px 0; }
+.journal::-webkit-scrollbar { width: 8px; }
+.journal::-webkit-scrollbar-track { background: #0b1c2c; }
+.journal::-webkit-scrollbar-thumb { background: #2e4a63; border-radius: 4px; }

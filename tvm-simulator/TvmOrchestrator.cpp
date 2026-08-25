@@ -154,7 +154,9 @@ void TvmOrchestrator::handle_inserer_espece(const nlohmann::json &payload) {
     }
 
     m_supervisor.set_state(TvmState::VALIDATING_PAYMENT);
-    finaliser_transaction("especes", "");
+    publish_etat();
+    double monnaie_rendue = static_cast<double>(a_rendre) / 100.0;
+    finaliser_transaction("especes", "", monnaie_rendue);
 }
 
 void TvmOrchestrator::handle_payer_carte(const nlohmann::json &payload) {
@@ -167,6 +169,7 @@ void TvmOrchestrator::handle_payer_carte(const nlohmann::json &payload) {
     std::string transaction_id = generate_transaction_id();
 
     m_supervisor.set_state(TvmState::VALIDATING_PAYMENT);
+    publish_etat();
 
     double montant_euros = static_cast<double>(m_selected_price) / 100.0;
     PaymentResult result = m_card_reader.pay(compte_id, montant_euros, transaction_id);
@@ -174,13 +177,14 @@ void TvmOrchestrator::handle_payer_carte(const nlohmann::json &payload) {
     if (!result.success) {
         m_supervisor.set_state(TvmState::ERROR);
         publish_erreur("paiement_refuse", result.statut);
+        publish_etat();
         m_supervisor.set_state(TvmState::IDLE);
         reset_transaction();
         publish_etat();
         return;
     }
 
-    finaliser_transaction("carte", compte_id);
+    finaliser_transaction("carte", compte_id, 0.0);
 }
 
 void TvmOrchestrator::handle_annuler() {
@@ -188,8 +192,10 @@ void TvmOrchestrator::handle_annuler() {
     if (etat_courant == TvmState::IDLE)
         return;
 
+    double montant_rendu = 0.0;
     if (etat_courant == TvmState::AWAITING_PAYMENT && m_montant_insere > 0) {
         m_cash_drawer.rollback();
+        montant_rendu = static_cast<double>(m_montant_insere) / 100.0;
         m_montant_insere = 0;
     }
 
@@ -199,16 +205,20 @@ void TvmOrchestrator::handle_annuler() {
         return;
     }
     reset_transaction();
+    if (montant_rendu > 0.0)
+        publish_annulation(montant_rendu);
     publish_etat();
 }
 
-void TvmOrchestrator::finaliser_transaction(const std::string &mode_paiement, const std::string &compte_id) {
+void TvmOrchestrator::finaliser_transaction(const std::string &mode_paiement, const std::string &compte_id, double monnaie_rendue) {
     m_supervisor.set_state(TvmState::PRINTING);
+    publish_etat();
 
     std::string ticket = m_selected_type + " (" + mode_paiement + ")";
     if (!m_printer.print(ticket)) {
         m_supervisor.set_state(TvmState::ERROR);
         publish_erreur("bourrage_papier", ticket);
+        publish_etat();
         m_supervisor.set_state(TvmState::IDLE);
         reset_transaction();
         publish_etat();
@@ -216,7 +226,8 @@ void TvmOrchestrator::finaliser_transaction(const std::string &mode_paiement, co
     }
 
     m_supervisor.set_state(TvmState::DISPENSING);
-    publish_vente(mode_paiement, compte_id, generate_transaction_id());
+    publish_etat();
+    publish_vente(mode_paiement, compte_id, generate_transaction_id(), monnaie_rendue);
     publish_caisse();
 
     m_supervisor.set_state(TvmState::IDLE);
@@ -260,13 +271,15 @@ void TvmOrchestrator::publish_caisse() {
     m_state_publisher->publish("tvm/" + m_tvm_id + "/caisse", caisse.dump(), 1, true);
 }
 
-void TvmOrchestrator::publish_vente(const std::string &mode_paiement, const std::string &compte_id, const std::string &transaction_id) {
+void TvmOrchestrator::publish_vente(const std::string &mode_paiement, const std::string &compte_id,
+                                     const std::string &transaction_id, double monnaie_rendue) {
     nlohmann::json vente = {
         {"tvm_id", m_tvm_id},
         {"transaction_id", transaction_id},
         {"type_titre", m_selected_type},
         {"prix_total", static_cast<double>(m_selected_price) / 100.0},
         {"mode_paiement", mode_paiement},
+        {"monnaie_rendue", monnaie_rendue},
         {"timestamp", now_timestamp()}
     };
     if (!compte_id.empty())
@@ -283,4 +296,13 @@ void TvmOrchestrator::publish_erreur(const std::string &type, const std::string 
         {"timestamp", now_timestamp()}
     };
     m_state_publisher->publish("tvm/" + m_tvm_id + "/erreurs/" + type, erreur.dump(), 1, false);
+}
+
+void TvmOrchestrator::publish_annulation(double montant_rendu) {
+    nlohmann::json annulation = {
+        {"tvm_id", m_tvm_id},
+        {"montant_rendu", montant_rendu},
+        {"timestamp", now_timestamp()}
+    };
+    m_state_publisher->publish("tvm/" + m_tvm_id + "/annulation", annulation.dump(), 1, false);
 }

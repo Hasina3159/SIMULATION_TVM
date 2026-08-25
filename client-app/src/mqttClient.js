@@ -11,6 +11,9 @@ export function useTvmConnection(tvmId, brokerUrl = 'ws://localhost:9001') {
     caisse: null,
     derniereVente: null,
     derniereErreur: null,
+    derniereAnnulation: null,
+    dernierType: null,       // 'vente' | 'erreur' | 'annulation' : le plus recent des trois
+    dernierEvenementId: 0,   // incremente a chaque vente/erreur/annulation, pour detecter la fraicheur
     journal: [],
   })
 
@@ -25,17 +28,31 @@ export function useTvmConnection(tvmId, brokerUrl = 'ws://localhost:9001') {
 
   client.on('message', (topic, payloadBuffer) => {
     const text = payloadBuffer.toString()
-    state.journal.unshift(`${topic} ${text}`)
-    if (state.journal.length > 40) state.journal.pop()
+    state.journal.push(`${topic} ${text}`)
+    if (state.journal.length > 60) state.journal.shift()
 
     if (topic === `tvm/${tvmId}/etat`) {
       try { state.etat = JSON.parse(text).etat } catch { /* ignore */ }
     } else if (topic === `tvm/${tvmId}/caisse`) {
       try { state.caisse = JSON.parse(text) } catch { /* ignore */ }
     } else if (topic === `tvm/${tvmId}/vente`) {
-      try { state.derniereVente = JSON.parse(text) } catch { /* ignore */ }
+      try {
+        state.derniereVente = JSON.parse(text)
+        state.dernierType = 'vente'
+        state.dernierEvenementId++
+      } catch { /* ignore */ }
     } else if (topic.startsWith(`tvm/${tvmId}/erreurs/`)) {
-      try { state.derniereErreur = JSON.parse(text) } catch { /* ignore */ }
+      try {
+        state.derniereErreur = JSON.parse(text)
+        state.dernierType = 'erreur'
+        state.dernierEvenementId++
+      } catch { /* ignore */ }
+    } else if (topic === `tvm/${tvmId}/annulation`) {
+      try {
+        state.derniereAnnulation = JSON.parse(text)
+        state.dernierType = 'annulation'
+        state.dernierEvenementId++
+      } catch { /* ignore */ }
     }
   })
 

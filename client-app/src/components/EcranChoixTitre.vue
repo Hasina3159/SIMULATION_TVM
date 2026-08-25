@@ -1,7 +1,7 @@
 <script setup>
 const emit = defineEmits(['choisir', 'annuler'])
 
-// Catalogue statique, en centimes — doit correspondre a m_catalogue dans
+// Catalogue statique, en centimes : doit correspondre a m_catalogue dans
 // TvmOrchestrator.cpp.
 const CATALOGUE = [
   { type_titre: 'ticket_unique', label: 'Ticket unique', prix: 200 },
@@ -26,7 +26,7 @@ function formatPrix(centimes) {
       @click="emit('choisir', titre)"
     >
       {{ titre.label }}
-      <span class="price-tag"> — {{ formatPrix(titre.prix) }}</span>
+      <span class="price-tag"> : {{ formatPrix(titre.prix) }}</span>
     </button>
     <button class="btn btn-cancel" @click="emit('annuler')">Annuler</button>
   </div>
