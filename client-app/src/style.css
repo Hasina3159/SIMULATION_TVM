@@ -8,7 +8,6 @@
   --accent-error: #c62828;
   --text-dark: #14202c;
   --text-muted: #5b6b7a;
-  --radius: 14px;
 }
 
 * { box-sizing: border-box; }
@@ -32,7 +31,6 @@ body {
   width: 420px;
   min-height: 720px;
   background: var(--kiosk-frame);
-  border-radius: 28px;
   padding: 18px;
   display: flex;
   flex-direction: column;
@@ -61,7 +59,6 @@ body {
   font-size: 0.7rem;
   letter-spacing: 0;
   padding: 3px 8px;
-  border-radius: 6px;
 }
 
 .status-dot {
@@ -77,7 +74,6 @@ body {
 .kiosk-screen {
   flex: 1;
   background: var(--screen-bg);
-  border-radius: var(--radius);
   padding: 28px 22px;
   display: flex;
   flex-direction: column;
@@ -110,7 +106,6 @@ body {
   gap: 10px;
   width: 100%;
   border: none;
-  border-radius: 10px;
   padding: 16px 18px;
   font-size: 1rem;
   font-weight: 600;
@@ -150,7 +145,6 @@ body {
 
 .recap-card {
   background: #f4f7fa;
-  border-radius: 10px;
   padding: 16px;
   margin-bottom: 8px;
 }
@@ -168,7 +162,6 @@ body {
   display: flex;
   justify-content: space-between;
   background: #f4f7fa;
-  border-radius: 10px;
   padding: 12px 16px;
   margin-bottom: 6px;
   font-weight: 600;
@@ -213,7 +206,6 @@ body {
 .erreur-box {
   background: #fdecea;
   color: var(--accent-error);
-  border-radius: 10px;
   padding: 16px;
   font-weight: 600;
   text-align: center;
@@ -225,7 +217,6 @@ body {
   color: #7fd67f;
   font-family: "Courier New", monospace;
   font-size: 0.68rem;
-  border-radius: 8px;
   padding: 8px;
   height: 170px;
   overflow-y: scroll;
@@ -235,4 +226,4 @@ body {
 .journal div { white-space: nowrap; padding: 1px 0; }
 .journal::-webkit-scrollbar { width: 8px; }
 .journal::-webkit-scrollbar-track { background: #0b1c2c; }
-.journal::-webkit-scrollbar-thumb { background: #2e4a63; border-radius: 4px; }
+.journal::-webkit-scrollbar-thumb { background: #2e4a63; }

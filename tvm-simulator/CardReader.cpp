@@ -8,9 +8,6 @@ CardReader::CardReader(const std::string &server_adress, const std::string &clie
       m_payment_topic(payment_topic),
       m_timeout(timeout),
       m_payment_client(std::make_unique<MqttPublisher>(server_adress, client_id)),
-      // client_id distinct pour la connexion d'écoute : deux mqtt::async_client
-      // avec le même client_id sur le même broker se feraient mutuellement
-      // déconnecter par le broker (contrainte du protocole MQTT).
       m_response_client(std::make_unique<MqttSubscriber>(
           server_adress, client_id + "_sub",
           client_id + "/lwt", "offline", 1, true,
@@ -31,8 +28,6 @@ CardReader::CardReader(std::unique_ptr<IMqttPublisher> payment_client,
       m_payment_client(std::move(payment_client)),
       m_response_client(nullptr)
 {
-    // Pas de vraie connexion d'ecoute ici : les tests simulent une reponse
-    // du Collector en appelant on_response_received(...) directement.
 }
 
 std::string CardReader::generate_correlation_id() {
@@ -82,7 +77,7 @@ void CardReader::on_response_received(mqtt::const_message_ptr message) {
 
         std::lock_guard<std::mutex> lock(m_mutex);
         if (m_pending_correlation_id.empty() || correlation_id != m_pending_correlation_id)
-            return; // reponse tardive ou hors sujet -> ignoree, jamais de crash
+            return;
 
         result.statut = reponse.at("statut").get<std::string>();
         result.success = (result.statut == "accepte");
