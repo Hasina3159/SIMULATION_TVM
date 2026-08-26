@@ -27,7 +27,7 @@ function payer() {
   </div>
   <div class="screen-body">
     <input v-model="compteId" placeholder="compte_id" :disabled="enAttente"
-           style="padding:12px;border-radius:8px;border:1px solid #ccd6e0;font-size:1rem;" />
+           style="padding:12px;border-radius:8px;border:none;background:#eef2f6;font-size:1rem;" />
 
     <button class="btn btn-primary" :disabled="enAttente" @click="payer">
       {{ enAttente ? 'Debit en cours...' : 'Valider le paiement' }}

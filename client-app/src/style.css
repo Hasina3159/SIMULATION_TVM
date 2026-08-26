@@ -34,7 +34,6 @@ body {
   background: var(--kiosk-frame);
   border-radius: 28px;
   padding: 18px;
-  border: 1px solid #1c3a56;
   display: flex;
   flex-direction: column;
 }
