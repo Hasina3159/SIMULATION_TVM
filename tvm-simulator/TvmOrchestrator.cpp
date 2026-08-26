@@ -213,6 +213,9 @@ void TvmOrchestrator::handle_annuler() {
 void TvmOrchestrator::finaliser_transaction(const std::string &mode_paiement, const std::string &compte_id, double monnaie_rendue) {
     m_supervisor.set_state(TvmState::PRINTING);
     publish_etat();
+    // Delai realiste (impression physique), et laisse le temps au message
+    // MQTT precedent d'etre distinctement recu avant le suivant.
+    std::this_thread::sleep_for(std::chrono::milliseconds(600));
 
     std::string ticket = m_selected_type + " (" + mode_paiement + ")";
     if (!m_printer.print(ticket)) {

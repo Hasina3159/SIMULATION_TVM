@@ -25,31 +25,48 @@ const etapeLocale = ref('ACCUEIL') // ACCUEIL | CHOIX_TITRE | RECAPITULATIF | RE
 const titreChoisi = ref(null)
 const moyenPaiement = ref(null)
 
-// Id de reference pris au moment ou une transaction reseau demarre, pour
-// savoir si un evenement (vente/erreur/annulation) frais est arrive PENDANT
-// cette transaction avant de decider s'il y a un resultat a montrer.
-let idAvantTransaction = 0
+// true entre le moment ou on lance une transaction reseau et celui ou son
+// resultat (vente/erreur/annulation) a ete affiche.
+const enTransaction = ref(false)
 let resultTimer = null
+let idleReturnTimer = null
 
-watch(() => props.state.etat, (etat, ancienEtat) => {
-  if (etat !== 'IDLE') return
-
+// Reagit directement a l'ARRIVEE d'un evenement de resultat, jamais a une
+// transition d'etat : "vente" (QoS 2) et "etat" (QoS 1) n'ont aucune garantie
+// d'ordre de livraison relatif venant du meme client MQTT, donc guetter
+// "l'etat devient IDLE" pour verifier si un resultat est arrive est fragile.
+watch(() => props.state.dernierEvenementId, () => {
+  if (!enTransaction.value) return
+  enTransaction.value = false
+  clearTimeout(idleReturnTimer)
+  etapeLocale.value = 'RESULTAT'
   clearTimeout(resultTimer)
-  if (props.state.dernierEvenementId > idAvantTransaction) {
-    etapeLocale.value = 'RESULTAT'
-    resultTimer = setTimeout(() => {
-      etapeLocale.value = 'ACCUEIL'
-      titreChoisi.value = null
-      moyenPaiement.value = null
-    }, 3500)
-  } else if (ancienEtat !== undefined) {
+  resultTimer = setTimeout(() => {
     etapeLocale.value = 'ACCUEIL'
     titreChoisi.value = null
     moyenPaiement.value = null
-  }
+  }, 3500)
 })
 
-onUnmounted(() => clearTimeout(resultTimer))
+// Filet de securite pour une annulation SANS remboursement (rien insere) :
+// aucun evenement dedie n'est publie dans ce cas. On laisse une petite marge
+// apres le retour a IDLE au cas ou un evenement arriverait juste derriere.
+watch(() => props.state.etat, (etat) => {
+  if (etat !== 'IDLE' || !enTransaction.value) return
+  clearTimeout(idleReturnTimer)
+  idleReturnTimer = setTimeout(() => {
+    if (!enTransaction.value) return
+    enTransaction.value = false
+    etapeLocale.value = 'ACCUEIL'
+    titreChoisi.value = null
+    moyenPaiement.value = null
+  }, 300)
+})
+
+onUnmounted(() => {
+  clearTimeout(resultTimer)
+  clearTimeout(idleReturnTimer)
+})
 
 function demarrer() {
   etapeLocale.value = 'CHOIX_TITRE'
@@ -67,7 +84,7 @@ function annulerLocal() {
 
 function confirmerPaiement(moyen) {
   moyenPaiement.value = moyen
-  idAvantTransaction = props.state.dernierEvenementId
+  enTransaction.value = true
   props.publier('selection_titre', {
     type_titre: titreChoisi.value.type_titre,
     quantite: 1,
@@ -79,6 +96,15 @@ function annulerTransaction() {
 }
 
 const ecranActif = computed(() => {
+  // Une fois un resultat frais affiche, il reste prioritaire pendant sa
+  // duree d'affichage, meme si le backend republie encore de l'etat brut
+  // juste apres (ex: un dernier message IDLE qui arrive en retard).
+  if (etapeLocale.value === 'RESULTAT') {
+    if (props.state.dernierType === 'erreur') return 'erreur'
+    if (props.state.dernierType === 'annulation') return 'annulation'
+    return 'distribution'
+  }
+
   const etat = props.state.etat
 
   if (etat === 'AWAITING_PAYMENT')
@@ -88,11 +114,6 @@ const ecranActif = computed(() => {
   if (etat === 'DISPENSING') return 'distribution'
   if (etat === 'ERROR') return 'erreur'
 
-  if (etapeLocale.value === 'RESULTAT') {
-    if (props.state.dernierType === 'erreur') return 'erreur'
-    if (props.state.dernierType === 'annulation') return 'annulation'
-    return 'distribution'
-  }
   if (etapeLocale.value === 'CHOIX_TITRE') return 'choix_titre'
   if (etapeLocale.value === 'RECAPITULATIF') return 'recapitulatif'
   return 'accueil'
